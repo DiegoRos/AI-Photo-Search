@@ -30,6 +30,16 @@ Thumbs.db
 # Secrets and local config
 secrets.json
 config.local.json
+local.settings.ps1
+*.ps1
+
+# Lambda function libraries
+    # Ignore everything in lf1 and lf2 folders except python code
+backend/lf1/*
+!backend/lf1/*.py
+backend/lf2/*
+!backend/lf2/*.py
+
 
 # IDE/editor swap files
 *.swp
@@ -38,7 +48,7 @@ config.local.json
 
 # Assignment data
 CC_Spring2026_Assignment3.pdf
-
+images/
 
 # Gemini.md
 GEMINI.md

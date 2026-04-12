@@ -1,39 +1,91 @@
 import { useState } from 'react'
 import './App.css'
 
+// Initialize API Gateway SDK
+// Using a lazy initializer to ensure window.apigClientFactory is available
+const getApigClient = () => {
+  if (window.apigClientFactory) {
+    return window.apigClientFactory.newClient({
+      apiKey: '' // If you have an API Key, put it here
+    });
+  }
+  return null;
+};
+
+const apigClient = getApigClient();
+
 function App() {
   const [searchQuery, setSearchBar] = useState('')
   const [photos, setPhotos] = useState([])
   const [selectedFile, setSelectedFile] = useState(null)
   const [customLabels, setCustomLabels] = useState('')
 
-  // Placeholder for GET /search
+  // Search photos using the SDK
   const searchPhotos = async (query) => {
-    console.log('Searching for:', query)
-    // This is where you would call the API Gateway SDK
-    // Example: sdk.searchGet({q: query})
-    
-    // Mocking response for now
-    const mockResults = [
-      { url: 'https://via.placeholder.com/300', labels: ['dog', 'park'] },
-      { url: 'https://via.placeholder.com/301', labels: ['cat', 'home'] },
-    ]
-    setPhotos(mockResults)
-  }
-
-  // Placeholder for PUT /upload
-  const uploadPhoto = async (file, labels) => {
-    if (!file) {
-      alert('Please select a file first!')
-      return
+    if (!query) return;
+    if (!apigClient) {
+      console.error("SDK not loaded");
+      return;
     }
-    console.log('Uploading file:', file.name)
-    console.log('With custom labels:', labels)
+    console.log('Searching for:', query);
     
-    // This is where you would call the API Gateway SDK
-    // Example: sdk.uploadPut({}, file, {headers: {'x-amz-meta-customLabels': labels}})
-    
-    alert('Upload triggered! Check console for details.')
+    try {
+      const params = { q: query };
+      const body = {};
+      const additionalParams = {};
+
+      const result = await apigClient.searchGet(params, body, additionalParams);
+      console.log('Search result:', result);
+      
+      // Extract photos from result.data.results (based on Swagger definition)
+      const results = result.data.results || [];
+      setPhotos(results);
+    } catch (error) {
+      console.error("Search failed:", error);
+      alert("Search failed. Check console for details.");
+    }
+  };
+
+  // Upload photo using the SDK
+  const uploadPhoto = async (file, labels) => {
+    if (!file) return;
+    if (!apigClient) {
+      console.error("SDK not loaded");
+      alert("SDK not loaded. Refresh the page.");
+      return;
+    }
+    console.log('Uploading file:', file.name);
+
+    try {
+      const params = {
+        item: file.name
+      };
+      const body = file; // The binary file blob
+      const additionalParams = {
+        headers: {
+          'Content-Type': file.type,
+          'x-amz-meta-customlabels': labels
+        }
+      };
+
+      const result = await apigClient.uploadPut(params, body, additionalParams);
+      console.log('Upload result:', result);
+      if (result.status === 200) {
+        alert('Upload successful!');
+        setCustomLabels('');
+        setSelectedFile(null);
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed. Check console for details.");
+    }
+  };
+
+  const handleClear = () => {
+    setSearchBar('')
+    setPhotos([])
+    setSelectedFile(null)
+    setCustomLabels('')
   }
 
   const handleSearch = (e) => {
@@ -59,6 +111,7 @@ function App() {
             onChange={(e) => setSearchBar(e.target.value)}
           />
           <button type="submit">Search</button>
+          <button type="button" onClick={handleClear} className="secondary">Clear</button>
         </form>
 
         <form className="upload-section" onSubmit={handleUpload}>

@@ -36,12 +36,21 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /upload:
+  /upload/{item}:
     put:
       summary: photo upload method
       description: |
         This API takes in the multi-part body sent to it (ex. a photo) and uploads it to an S3 bucket.
       operationId: uploadPhoto
+      parameters:
+        - name: item
+          in: path
+          required: true
+          type: string
+        - name: x-amz-meta-customLabels
+          in: header
+          required: false
+          type: string
       consumes:
         - image/png
         - image/jpg

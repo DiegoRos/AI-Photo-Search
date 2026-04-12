@@ -162,6 +162,17 @@ button {
   transition: border-color 0.25s;
 }
 
+button.secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+button.secondary:hover {
+  background-color: #e0e0e0;
+  border-color: #bbb;
+}
+
 button:hover {
   border-color: #646cff;
   background-color: #535bf2;

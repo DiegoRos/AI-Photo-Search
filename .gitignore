@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.envrc
+.venv/
+
+# VS Code
+.vscode/
+
+# AWS deployment artifacts
+*.zip
+*.egg-info/
+*.dist-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python bytecode cache
+.pytest_cache/
+
+# Secrets and local config
+secrets.json
+config.local.json
+
+# IDE/editor swap files
+*.swp
+*.swo
+
+
+# Assignment data
+CC_Spring2026_Assignment3.pdf
+
+
+# Gemini.md
+GEMINI.md

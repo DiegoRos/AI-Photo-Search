@@ -1,0 +1,168 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+header {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.upload-section {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px dashed #ddd;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .upload-section {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+}
+
+.upload-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.upload-inputs input[type="text"] {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.photo-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  transition: transform 0.2s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .photo-card {
+    background-color: #333;
+  }
+}
+
+.photo-card:hover {
+  transform: translateY(-5px);
+}
+
+.photo-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-info {
+  padding: 1rem;
+  text-align: left;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.label {
+  background-color: #e0e0e0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.delete-label {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #888;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.delete-label:hover {
+  color: #ff4d4f;
+  background: none;
+}
+
+.edit-labels {
+  margin-top: 0.8rem;
+}
+
+.edit-labels input {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  .label {
+    background-color: #555;
+    color: #eee;
+  }
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #646cff;
+  color: white;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+  background-color: #535bf2;
+}

@@ -64,11 +64,11 @@ function App() {
       const additionalParams = {
         headers: {
           'Content-Type': file.type,
-          'x-amz-meta-customlabels': labels
+          'x-amz-meta-customLabels': labels
         }
       };
 
-      const result = await apigClient.uploadPut(params, body, additionalParams);
+      const result = await apigClient.uploadItemPut(params, body, additionalParams);
       console.log('Upload result:', result);
       if (result.status === 200) {
         alert('Upload successful!');
@@ -101,7 +101,7 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>Photo Album</h1>
+        <h1>AI Photo Search</h1>
         
         <form className="search-bar" onSubmit={handleSearch}>
           <input 

@@ -3,6 +3,12 @@ info:
   title: AI Photo Search
   description: 'AI Photo Search application, built during the Cloud and Big Data course at Columbia University.'
   version: 1.0.0
+x-amazon-apigateway-binary-media-types:
+  - 'image/png'
+  - 'image/jpg'
+  - 'image/jpeg'
+  - 'image/bmp'
+  - 'image/webp'
 schemes:
   - https
 basePath: /v1
@@ -18,8 +24,7 @@ paths:
       parameters:
         - in: query
           name: q
-          schema:
-            type: string
+          type: string
           description: the string to be searched
       produces:
         - application/json
@@ -43,6 +48,11 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/YOUR_SEARCH_LAMBDA_ARN/invocations"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
     options:
       summary: CORS support
       description: |
@@ -89,10 +99,16 @@ paths:
           in: header
           required: false
           type: string
+        - name: Content-Type
+          in: header
+          required: false
+          type: string
       consumes:
         - image/png
         - image/jpg
         - image/jpeg
+        - image/bmp
+        - image/webp
       produces:
         - application/json
       responses:
@@ -115,6 +131,21 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:us-east-1:s3:path/YOUR_S3_BUCKET/{item}"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.header.x-amz-meta-customLabels: "method.request.header.x-amz-meta-customLabels"
+          integration.request.path.item: "method.request.path.item"
+          integration.request.header.Content-Type: "method.request.header.Content-Type"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PUT"
+        type: "aws"
+        credentials: "YOUR_IAM_ROLE_ARN"
     options:
       summary: CORS support
       description: |

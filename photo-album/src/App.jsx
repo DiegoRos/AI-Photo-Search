@@ -58,15 +58,12 @@ function App() {
 
     try {
       const params = {
-        item: file.name
+        item: file.name,
+        'Content-Type': file.type,
+        'x-amz-meta-customLabels': labels
       };
       const body = file; // The binary file blob
-      const additionalParams = {
-        headers: {
-          'Content-Type': file.type,
-          'x-amz-meta-customLabels': labels
-        }
-      };
+      const additionalParams = {};
 
       const result = await apigClient.uploadItemPut(params, body, additionalParams);
       console.log('Upload result:', result);
@@ -119,7 +116,7 @@ function App() {
           <div className="upload-inputs">
             <input 
               type="file" 
-              accept="image/png, image/jpeg, image/jpg"
+              accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp"
               onChange={(e) => setSelectedFile(e.target.files[0])}
             />
             <input 

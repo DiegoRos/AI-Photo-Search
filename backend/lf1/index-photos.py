@@ -21,14 +21,34 @@ def lambda_handler(event, context):
     logger.info(f"Received event: {json.dumps(event)}")
     
     try:
-        # Extract bucket and key from event
+        # Get bucket and key from event
         bucket = event['Records'][0]['s3']['bucket']['name']
         key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
-        logger.info(f"Processing object: {key} from bucket: {bucket}")
+        event_size = event['Records'][0]['s3']['object'].get('size', -1)
+        logger.info(f"Processing object: {key} from bucket: {bucket}. Event size: {event_size}")
+        
+        # Quick check if event says size is 0
+        if event_size == 0:
+            logger.warning(f"File {key} is reported as 0 bytes in the event. Skipping Rekognition.")
+            return {
+                'statusCode': 200,
+                'body': json.dumps('Skipped empty file based on event size')
+            }
         
         # Get metadata from S3
         logger.info(f"Fetching S3 head_object for {key}")
         response = s3.head_object(Bucket=bucket, Key=key)
+        content_length = int(response.get('ContentLength', 0))
+        logger.info(f"S3 response ContentLength: {content_length}")
+        
+        # Check if file is empty via head_object
+        if content_length == 0:
+            logger.warning(f"File {key} is 0 bytes according to S3. Skipping Rekognition.")
+            return {
+                'statusCode': 200,
+                'body': json.dumps('Skipped empty file based on S3 ContentLength')
+            }
+            
         logger.info(f"S3 response metadata: {response.get('Metadata')}")
         
         # x-amz-meta-customLabels comes as 'customlabels' in Boto3
@@ -36,16 +56,23 @@ def lambda_handler(event, context):
         labels_list = [l.strip() for l in custom_labels.split(',')] if custom_labels else []
         logger.info(f"Custom labels extracted: {labels_list}")
         
-        # Detect labels using Rekognition
-        logger.info(f"Calling Rekognition detect_labels for {key}")
-        rek_response = rekognition.detect_labels(
-            Image={'S3Object': {'Bucket': bucket, 'Name': key}},
-            MaxLabels=10,
-            MinConfidence=75
-        )
-        
-        rek_labels = [label['Name'] for label in rek_response['Labels']]
-        logger.info(f"Rekognition detected labels: {rek_labels}")
+        # Detect labels using Rekognition for supported formats (JPEG, PNG, BMP, WebP)
+        rek_labels = []
+        supported_rek_formats = ('.jpg', '.jpeg', '.png', '.bmp', '.webp')
+        if key.lower().endswith(supported_rek_formats):
+            logger.info(f"Calling Rekognition detect_labels for {key}")
+            try:
+                rek_response = rekognition.detect_labels(
+                    Image={'S3Object': {'Bucket': bucket, 'Name': key}},
+                    MaxLabels=10,
+                    MinConfidence=75
+                )
+                rek_labels = [label['Name'] for label in rek_response['Labels']]
+                logger.info(f"Rekognition detected labels: {rek_labels}")
+            except Exception as rek_err:
+                logger.warning(f"Rekognition failed for {key}: {rek_err}")
+        else:
+            logger.info(f"Format for {key} not supported by Rekognition. Skipping detect_labels.")
         
         for label_name in rek_labels:
             labels_list.append(label_name)

@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - cd photo-album
+      - npm install
+  build:
+    commands:
+      - echo Building Vite application...
+      - npm run build
+
+artifacts:
+  base-directory: photo-album/dist
+  files:
+    - '**/*'

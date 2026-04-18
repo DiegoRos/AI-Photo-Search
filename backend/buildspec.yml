@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+  build:
+    commands:
+      - echo Installing dependencies for LF1...
+      - cd backend/lf1 && pip install -r requirements.txt -t . && cd ../..
+      - echo Installing dependencies for LF2...
+      - cd backend/lf2 && pip install -r requirements.txt -t . && cd ../..
+      - echo Packaging CloudFormation template...
+      - aws cloudformation package --template-file cloudformation.yaml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged.yaml
+
+artifacts:
+  files:
+    - packaged.yaml

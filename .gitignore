@@ -34,11 +34,13 @@ local.settings.ps1
 *.ps1
 
 # Lambda function libraries
-    # Ignore everything in lf1 and lf2 folders except python code
+    # Ignore everything in lf1 and lf2 folders except python code and requirements
 backend/lf1/*
 !backend/lf1/*.py
+!backend/lf1/requirements.txt
 backend/lf2/*
 !backend/lf2/*.py
+!backend/lf2/requirements.txt
 
 
 # IDE/editor swap files

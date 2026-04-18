@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AI Photo Search Application Infrastructure
+
+Parameters:
+  OpenSearchUser:
+    Type: String
+    Default: admin
+  OpenSearchPass:
+    Type: String
+    NoEcho: true
+    Default: Admin123!
+  LexBotId:
+    Type: String
+  LexBotAliasId:
+    Type: String
+  OpenSearchDomainName:
+    Type: String
+    Default: photos
+  FrontendBucketName:
+    Type: String
+  PhotosBucketName:
+    Type: String
+
+Resources:
+  # S3 Buckets
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref FrontendBucketName
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+
+  PhotosBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref PhotosBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: ["PUT", "GET", "POST"]
+            AllowedOrigins: ['*']
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Function: !GetAtt LF1IndexPhotos.Arn
+
+  # OpenSearch Domain
+  OpenSearchDomain:
+    Type: AWS::OpenSearchService::Domain
+    Properties:
+      DomainName: !Ref OpenSearchDomainName
+      EngineVersion: OpenSearch_2.11
+      ClusterConfig:
+        InstanceType: t3.small.search
+        InstanceCount: 1
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+      EncryptionAtRestOptions:
+        Enabled: true
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: !Ref OpenSearchUser
+          MasterUserPassword: !Ref OpenSearchPass
+      AccessPolicies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt LF1ExecutionRole.Arn
+                - !GetAtt LF2ExecutionRole.Arn
+            Action: 'es:ESHttp*'
+            Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*'
+
+  # IAM Roles
+  LF1ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LF1Permissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:HeadObject
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+              - Effect: Allow
+                Action: rekognition:DetectLabels
+                Resource: '*'
+              - Effect: Allow
+                Action: es:ESHttpPost
+                Resource: !Sub "${OpenSearchDomain.Arn}/*"
+
+  LF2ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LF2Permissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lex:RecognizeText
+                Resource: '*'
+              - Effect: Allow
+                Action: es:ESHttpPost
+                Resource: !Sub "${OpenSearchDomain.Arn}/*"
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+
+  ApiGatewayS3Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiS3Permissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+
+  # Lambda Functions
+  LF1IndexPhotos:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: index-photos
+      Handler: index-photos.lambda_handler
+      Role: !GetAtt LF1ExecutionRole.Arn
+      Code: ./backend/lf1
+      Runtime: python3.9
+      Environment:
+        Variables:
+          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+          OS_USER: !Ref OpenSearchUser
+          OS_PASS: !Ref OpenSearchPass
+
+  LF2SearchPhotos:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: search-photos
+      Handler: search-photos.lambda_handler
+      Role: !GetAtt LF2ExecutionRole.Arn
+      Code: ./backend/lf2
+      Runtime: python3.9
+      Environment:
+        Variables:
+          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+          LEX_BOT_ID: !Ref LexBotId
+          LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
+          OS_USER: !Ref OpenSearchUser
+          OS_PASS: !Ref OpenSearchPass
+          S3_BUCKET: !Ref PhotosBucket
+
+  # S3 Permission for Lambda Trigger
+  LF1S3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt LF1IndexPhotos.Arn
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub "arn:aws:s3:::${PhotosBucket}"
+
+  # API Gateway
+  PhotoApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: PhotoAlbumAPI
+      BinaryMediaTypes:
+        - 'image/png'
+        - 'image/jpg'
+        - 'image/jpeg'
+        - 'image/bmp'
+        - 'image/webp'
+      Body:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ./swagger.yaml
+
+  # API Deployment & Stage
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: PhotoApi
+    Properties:
+      RestApiId: !Ref PhotoApi
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref PhotoApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: v1
+
+Outputs:
+  FrontendBucketName:
+    Value: !Ref FrontendBucket
+    Export:
+      Name: photo-search-stack-FrontendBucketName
+  WebsiteURL:
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  ApiURL:
+    Value: !Sub "https://${PhotoApi}.execute-api.${AWS::Region}.amazonaws.com/v1"

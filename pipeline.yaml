@@ -42,7 +42,7 @@ Resources:
             Value: !Ref PipelineArtifactBucket
       Source:
         Type: CODEPIPELINE
-        BuildSpec: backend/buildspec.yml
+        BuildSpec: buildspec-backend.yml
 
   # CodeBuild for Frontend
   FrontendBuildProject:
@@ -58,7 +58,7 @@ Resources:
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
       Source:
         Type: CODEPIPELINE
-        BuildSpec: photo-album/buildspec.yml
+        BuildSpec: buildspec-frontend.yml
 
   # IAM Role for CodeBuild
   CodeBuildRole:

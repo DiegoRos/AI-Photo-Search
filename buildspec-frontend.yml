@@ -13,7 +13,7 @@ phases:
       - echo Building Vite application...
       - pwd
       - ls -al
-      - cd npm run build
+      - npm run build
 
 artifacts:
   base-directory: photo-album/dist

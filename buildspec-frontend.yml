@@ -5,12 +5,12 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - cd photo-album
-      - npm install
+      - echo Installing frontend dependencies...
+      - cd photo-album && npm install
   build:
     commands:
       - echo Building Vite application...
-      - npm run build
+      - cd photo-album && npm run build
 
 artifacts:
   base-directory: photo-album/dist

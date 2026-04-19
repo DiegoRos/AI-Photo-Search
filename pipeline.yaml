@@ -34,9 +34,9 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Environment:
-        Type: LINUX_LAMBDA_CONTAINER
-        ComputeType: BUILD_LAMBDA_1GB
-        Image: aws/codebuild/amazonlinux-x86_64-lambda-standard:python3.9
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
         EnvironmentVariables:
           - Name: ARTIFACT_BUCKET
             Value: !Ref PipelineArtifactBucket
@@ -53,9 +53,9 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Environment:
-        Type: LINUX_LAMBDA_CONTAINER
-        ComputeType: BUILD_LAMBDA_1GB
-        Image: aws/codebuild/amazonlinux-x86_64-lambda-standard:nodejs18
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
       Source:
         Type: CODEPIPELINE
         BuildSpec: buildspec-frontend.yml

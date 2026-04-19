@@ -6,13 +6,14 @@ phases:
       nodejs: 20
     commands:
       - echo Installing frontend dependencies...
-      - npm install
-    working-directory: photo-album
+      - ls -al
+      - cd photo-album && npm install
   build:
     commands:
       - echo Building Vite application...
-      - npm run build
-    working-directory: photo-album
+      - pwd
+      - ls -al
+      - cd npm run build
 
 artifacts:
   base-directory: photo-album/dist

@@ -129,18 +129,21 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudformation:ValidateTemplate
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListStacks
+                  - cloudformation:GetTemplateSummary
                 Resource: "*"
               - Effect: Allow
                 Action:
                   - cloudformation:CreateStack
                   - cloudformation:DeleteStack
-                  - cloudformation:DescribeStacks
                   - cloudformation:UpdateStack
                   - cloudformation:CreateChangeSet
                   - cloudformation:DeleteChangeSet
                   - cloudformation:DescribeChangeSet
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:SetStackPolicy
+                  - cloudformation:GetTemplate
                 Resource:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack"

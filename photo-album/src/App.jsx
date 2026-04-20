@@ -183,6 +183,9 @@ function App() {
           <p>No photos to show. Try searching!</p>
         )}
       </main>
+      <footer style={{ marginTop: '50px', textAlign: 'center', fontSize: '2em', fontWeight: 'bold', color: '#ff4444' }}>
+        This is the website before a commit
+      </footer>
     </div>
   )
 }

@@ -138,7 +138,7 @@ Resources:
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:SetStackPolicy
                   - cloudformation:ValidateTemplate
-                Resource: !Sub "arn:aws:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
+                Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
               - Effect: Allow
                 Action:
                   - s3:GetObject

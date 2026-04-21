@@ -206,26 +206,13 @@ Resources:
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          ForwardedValues:
-            QueryString: false
-            Cookies:
-              Forward: none
+          CachePolicyId: 65832739-81ce-4e3a-a1ee-9ef2247f31da # Managed-CachingOptimized
         CacheBehaviors:
           - PathPattern: "/v1/*"
             TargetOriginId: ApiOrigin
             ViewerProtocolPolicy: https-only
-            ForwardedValues:
-              QueryString: true
-              Headers:
-                - Accept
-                - Content-Type
-                - Authorization
-                - x-amz-meta-customLabels
-              Cookies:
-                Forward: none
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b3913165822 # Managed-CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40a8-b010-297c2f1b77ee # Managed-AllViewerExceptHostHeader
 
   # API Gateway
   PhotoApi:

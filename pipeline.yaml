@@ -137,8 +137,8 @@ Resources:
                 Action:
                   - cloudformation:CreateStack
                   - cloudformation:DeleteStack
-                  - cloudformation:DescribeStacks
                   - cloudformation:UpdateStack
+                  - cloudformation:DescribeStacks
                   - cloudformation:CreateChangeSet
                   - cloudformation:DeleteChangeSet
                   - cloudformation:DescribeChangeSet

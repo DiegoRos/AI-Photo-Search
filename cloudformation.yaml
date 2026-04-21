@@ -42,6 +42,16 @@ Resources:
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
 
+  PhotosBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref PhotosBucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt LF1IndexPhotos.Arn
+
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -76,8 +86,7 @@ Resources:
                 Action:
                   - s3:GetObject
                   - s3:HeadObject
-                # Use parameter to break dependency cycle
-                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
@@ -104,8 +113,7 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action: s3:GetObject
-                # Use parameter to break dependency cycle
-                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
@@ -124,8 +132,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:PutObject
-                # Use parameter to break dependency cycle
-                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
 
   # Lambda Functions
   LF1IndexPhotos:
@@ -155,7 +162,7 @@ Resources:
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
-          S3_BUCKET: !Ref PhotosBucketName
+          S3_BUCKET: !Ref PhotosBucket
 
 
   # S3 Permission for Lambda Trigger
@@ -166,8 +173,7 @@ Resources:
       FunctionName: !GetAtt LF1IndexPhotos.Arn
       Principal: s3.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
-      # Use wildcard or parameter to break cycle
-      SourceArn: !Sub "arn:aws:s3:::${PhotosBucketName}*"
+      SourceArn: !Sub "arn:aws:s3:::${PhotosBucketName}"
 
   # API Gateway
   PhotoApi:

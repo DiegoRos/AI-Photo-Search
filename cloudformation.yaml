@@ -185,35 +185,6 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PhotoApi}/*"
 
-  # CloudFront Distribution
-  AppDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: index.html
-        Origins:
-          - Id: S3Origin
-            DomainName: !Select [2, !Split ["/", !GetAtt FrontendBucket.WebsiteURL]]
-            CustomOriginConfig:
-              HTTPPort: 80
-              OriginProtocolPolicy: http-only
-          - Id: ApiOrigin
-            DomainName: !Sub "${PhotoApi}.execute-api.${AWS::Region}.amazonaws.com"
-            CustomOriginConfig:
-              HTTPSPort: 443
-              OriginProtocolPolicy: https-only
-        DefaultCacheBehavior:
-          TargetOriginId: S3Origin
-          ViewerProtocolPolicy: redirect-to-https
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
-        CacheBehaviors:
-          - PathPattern: "/v1/*"
-            TargetOriginId: ApiOrigin
-            ViewerProtocolPolicy: https-only
-            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
-            OriginRequestPolicyId: b689b0a8-53d0-40a8-b0e6-264c18b12859 # Managed-AllViewerExceptHostHeader
-
   # API Gateway
   PhotoApi:
     Type: AWS::ApiGateway::RestApi
@@ -251,9 +222,9 @@ Outputs:
     Export:
       Name: photo-search-stack-FrontendBucketName
   WebsiteURL:
-    Value: !Sub "https://${AppDistribution.DomainName}"
+    Value: !GetAtt FrontendBucket.WebsiteURL
   ApiURL:
-    Value: !Sub "https://${AppDistribution.DomainName}/v1"
+    Value: !Sub "https://${PhotoApi}.execute-api.${AWS::Region}.amazonaws.com/v1"
   RestApiId:
     Value: !Ref PhotoApi
 

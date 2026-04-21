@@ -24,7 +24,7 @@ Parameters:
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-search-v1-photos-bucket
+    Default: photo-storage-bucket-b2-972793825948-us-east-1-an
 
 
 Resources:
@@ -52,19 +52,6 @@ Resources:
             Principal: '*'
             Action: "s3:GetObject"
             Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
-
-  PhotosBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders: ['*']
-            AllowedMethods: ["PUT", "GET", "POST"]
-            AllowedOrigins: ['*']
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: "s3:ObjectCreated:*"
-            Function: !GetAtt LF1IndexPhotos.Arn
 
   # IAM Roles
   LF1ExecutionRole:
@@ -167,7 +154,7 @@ Resources:
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
-          S3_BUCKET: !Ref PhotosBucket
+          S3_BUCKET: !Ref PhotosBucketName
 
 
   # S3 Permission for Lambda Trigger

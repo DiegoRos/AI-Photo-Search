@@ -50,6 +50,7 @@ Resources:
 
   PhotosBucket:
     Type: AWS::S3::Bucket
+    DependsOn: LF1S3Permission
     Properties:
       BucketName: !Ref PhotosBucketName
       CorsConfiguration:
@@ -213,7 +214,7 @@ Resources:
       FunctionName: !GetAtt LF1IndexPhotos.Arn
       Principal: s3.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
-      SourceArn: !Sub "arn:aws:s3:::${PhotosBucket}"
+      SourceArn: !Sub "arn:aws:s3:::${PhotosBucketName}"
 
   # API Gateway
   PhotoApi:

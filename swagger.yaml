@@ -49,7 +49,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
-        uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LF2SearchPhotos.Arn}/invocations"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LF2SearchPhotos.Arn}/invocations"
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -132,7 +133,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
-        uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${PhotosBucket}/{item}"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:s3:path/${PhotosBucket}/{item}"
         responses:
           default:
             statusCode: "200"
@@ -145,7 +147,8 @@ paths:
         passthroughBehavior: "when_no_match"
         httpMethod: "PUT"
         type: "aws"
-        credentials: !GetAtt ApiGatewayS3Role.Arn
+        credentials:
+          Fn::GetAtt: [ApiGatewayS3Role, Arn]
     options:
       summary: CORS support
       description: |

@@ -156,7 +156,7 @@ Resources:
   LF2SearchPhotos:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: search-photos
+      FunctionName: search-photos-v1
       Handler: search-photos.lambda_handler
       Role:
         Fn::GetAtt:

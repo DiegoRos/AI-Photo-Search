@@ -3,11 +3,11 @@ Description: AI Photo Search Application Infrastructure
 Parameters:
   OpenSearchUser:
     Type: String
-    Default: admin
+    Default: dr3432
   OpenSearchPass:
     Type: String
     NoEcho: true
-    Default: Admin123!
+    Default: \#Tipo123
   ExistingOpenSearchEndpoint:
     Type: String
     Default: https://search-photos-azg567v37deut3tsvvucmickne.aos.us-east-1.on.aws
@@ -17,13 +17,13 @@ Parameters:
     Type: String
   OpenSearchDomainName:
     Type: String
-    Default: photos-v1
+    Default: photos
   FrontendBucketName:
     Type: String
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-storage-bucket-b2-972793825948-us-east-1-an
+    Default: photo-storage-bucket-b2-972793825948-us-east-1-an-v1
 Resources:
   FrontendBucket:
     Type: AWS::S3::Bucket
@@ -156,6 +156,7 @@ Resources:
   LF2SearchPhotos:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: search-photos
       Handler: search-photos.lambda_handler
       Role:
         Fn::GetAtt:
@@ -192,6 +193,17 @@ Resources:
         Ref: AWS::AccountId
       SourceArn:
         Fn::Sub: arn:aws:s3:::${PhotosBucketName}
+  LF2ApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+        - LF2SearchPhotos
+        - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PhotoApi}/*
   PhotoApi:
     Type: AWS::ApiGateway::RestApi
     Properties:

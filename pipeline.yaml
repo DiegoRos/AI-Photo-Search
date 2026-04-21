@@ -21,7 +21,7 @@ Parameters:
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-search-v1-photos-bucket
+    Default: photo-storage-bucket-b2-972793825948-us-east-1-an 
 
 Resources:
   PipelineArtifactBucket:
@@ -185,11 +185,11 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess # CFN needs broad access to create various resources
 
-  # Backend Pipeline
-  BackendPipeline:
+  # Integrated Application Pipeline
+  AppPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: photo-search-backend-pipeline
+      Name: photo-search-pipeline
       RoleArn: !GetAtt CodePipelineRole.Arn
       ArtifactStore:
         Type: S3
@@ -209,7 +209,7 @@ Resources:
                 BranchName: !Ref GitHubBranch
               OutputArtifacts:
                 - Name: SourceArtifact
-        - Name: Build
+        - Name: Build_Backend
           Actions:
             - Name: Build_And_Package
               ActionTypeId:
@@ -222,8 +222,8 @@ Resources:
               InputArtifacts:
                 - Name: SourceArtifact
               OutputArtifacts:
-                - Name: BuildArtifact
-        - Name: Deploy
+                - Name: BackendBuildArtifact
+        - Name: Deploy_Backend
           Actions:
             - Name: CloudFormation_Deploy
               ActionTypeId:
@@ -236,7 +236,7 @@ Resources:
                 StackName: photo-search-stack
                 Capabilities: CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
                 RoleArn: !GetAtt CFNRole.Arn
-                TemplatePath: BuildArtifact::packaged.yaml
+                TemplatePath: BackendBuildArtifact::packaged.yaml
                 ParameterOverrides: !Sub |
                   {
                     "LexBotId": "${LexBotId}",
@@ -245,33 +245,8 @@ Resources:
                     "PhotosBucketName": "${PhotosBucketName}"
                   }
               InputArtifacts:
-                - Name: BuildArtifact
-
-  # Frontend Pipeline
-  FrontendPipeline:
-    Type: AWS::CodePipeline::Pipeline
-    Properties:
-      Name: photo-search-frontend-pipeline
-      RoleArn: !GetAtt CodePipelineRole.Arn
-      ArtifactStore:
-        Type: S3
-        Location: !Ref PipelineArtifactBucket
-      Stages:
-        - Name: Source
-          Actions:
-            - Name: GitHub_Source
-              ActionTypeId:
-                Category: Source
-                Owner: AWS
-                Provider: CodeStarSourceConnection
-                Version: '1'
-              Configuration:
-                ConnectionArn: !Ref GitHubConnectionArn
-                FullRepositoryId: !Sub "${GitHubRepoOwner}/${GitHubRepoName}"
-                BranchName: !Ref GitHubBranch
-              OutputArtifacts:
-                - Name: SourceArtifact
-        - Name: Build
+                - Name: BackendBuildArtifact
+        - Name: Build_Frontend
           Actions:
             - Name: Build_Frontend
               ActionTypeId:
@@ -285,7 +260,7 @@ Resources:
                 - Name: SourceArtifact
               OutputArtifacts:
                 - Name: FrontendBuildArtifact
-        - Name: Deploy
+        - Name: Deploy_Frontend
           Actions:
             - Name: S3_Deploy
               ActionTypeId:

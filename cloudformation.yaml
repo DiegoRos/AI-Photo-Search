@@ -32,6 +32,7 @@ Resources:
   FrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
+      BucketName: !Ref FrontendBucketName
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html

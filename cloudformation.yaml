@@ -15,7 +15,7 @@ Parameters:
     Type: String
   OpenSearchDomainName:
     Type: String
-    Default: photos
+    Default: photos-v1
   FrontendBucketName:
     Type: String
     Default: photo-search-v1-frontend-bucket

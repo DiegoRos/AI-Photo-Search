@@ -14,20 +14,27 @@ phases:
       - STACK_OUTPUTS=$(aws cloudformation describe-stacks --stack-name photo-search-stack --query 'Stacks[0].Outputs')
       - API_URL=$(echo $STACK_OUTPUTS | jq -r '.[] | select(.OutputKey=="ApiURL") | .OutputValue')
       - REST_API_ID=$(echo $STACK_OUTPUTS | jq -r '.[] | select(.OutputKey=="RestApiId") | .OutputValue')
-      - echo "Using API URL: $API_URL"
-      - echo "Using Rest API ID: $REST_API_ID"
+      - "echo \"Using API URL: $API_URL\""
+      - "echo \"Using Rest API ID: $REST_API_ID\""
       - |
         if [ -n "$REST_API_ID" ] && [ "$REST_API_ID" != "null" ]; then
           echo "Downloading latest JavaScript SDK from API Gateway..."
-          aws apigateway get-sdk --rest-api-id $REST_API_ID --stage-name v1 --sdk-type javascript sdk.zip
-          unzip -o sdk.zip -d photo-album/public/
-          rm sdk.zip
-          echo "SDK updated successfully."
-        else
-          echo "WARNING: Could not fetch RestApiId. Falling back to manual URL replacement."
-          if [ -n "$API_URL" ] && [ "$API_URL" != "null" ]; then
-            sed -i "s|var invokeUrl = '.*';|var invokeUrl = '$API_URL';|g" photo-album/public/sdk/apigClient.js
+          if aws apigateway get-sdk --rest-api-id $REST_API_ID --stage-name v1 --sdk-type javascript sdk.zip; then
+            mkdir -p temp_sdk
+            unzip -o sdk.zip -d temp_sdk
+            cp -r temp_sdk/*/* photo-album/public/sdk/
+            rm -rf temp_sdk sdk.zip
+            echo "SDK updated successfully."
+          else
+            echo "Failed to download SDK."
           fi
+        else
+          echo "WARNING: Could not fetch RestApiId."
+        fi
+        
+        if [ -n "$API_URL" ] && [ "$API_URL" != "null" ]; then
+          echo "Updating invokeUrl in apigClient.js to $API_URL"
+          sed -i "s|var invokeUrl = '.*';|var invokeUrl = '$API_URL';|g" photo-album/public/sdk/apigClient.js
         fi
       - cd photo-album && npm run build
 

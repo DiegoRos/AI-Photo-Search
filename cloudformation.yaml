@@ -8,7 +8,7 @@ Parameters:
   OpenSearchPass:
     Type: String
     NoEcho: true
-    Default: \#Tipo123
+    Default: "#Tipo123"
   ExistingOpenSearchEndpoint:
     Type: String
     Default: "https://search-photos-azg567v37deut3tsvvucmickne.aos.us-east-1.on.aws"
@@ -200,7 +200,7 @@ Resources:
         Fn::Transform:
           Name: AWS::Include
           Parameters:
-            Location: s3://cf-templates-ukh091iw4l9z-us-east-1/swagger.yaml
+            Location: ./swagger.yaml
 
   # API Deployment & Stage
   ApiDeployment:

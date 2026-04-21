@@ -50,7 +50,7 @@ paths:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LF2SearchPhotos.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:search-photos/invocations"
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -134,7 +134,7 @@ paths:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:s3:path/${PhotosBucket}/{item}"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:s3:path/${PhotosBucketName}/{item}"
         responses:
           default:
             statusCode: "200"

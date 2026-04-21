@@ -93,8 +93,8 @@ Resources:
           - Effect: Allow
             Principal:
               AWS:
-                - !GetAtt LF1ExecutionRole.Arn
-                - !GetAtt LF2ExecutionRole.Arn
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/LF1ExecutionRole"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/LF2ExecutionRole"
             Action: 'es:ESHttp*'
             Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*'
 
@@ -102,6 +102,7 @@ Resources:
   LF1ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: LF1ExecutionRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -126,11 +127,12 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action: es:ESHttpPost
-                Resource: !Sub "${OpenSearchDomain.Arn}/*"
+                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
 
   LF2ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: LF2ExecutionRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -150,7 +152,7 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action: es:ESHttpPost
-                Resource: !Sub "${OpenSearchDomain.Arn}/*"
+                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"

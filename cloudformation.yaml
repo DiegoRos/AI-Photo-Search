@@ -18,8 +18,10 @@ Parameters:
     Default: photos
   FrontendBucketName:
     Type: String
+    Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
+    Default: photo-search-v1-photos-bucket
 
 Resources:
   # S3 Buckets

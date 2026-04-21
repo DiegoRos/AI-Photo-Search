@@ -9,6 +9,9 @@ Parameters:
     Type: String
     NoEcho: true
     Default: Admin123!
+  ExistingOpenSearchEndpoint:
+    Type: String
+    Default: "https://search-photos-azg567v37deut3tsvvucmickne.aos.us-east-1.on.aws"
   LexBotId:
     Type: String
   LexBotAliasId:
@@ -22,6 +25,7 @@ Parameters:
   PhotosBucketName:
     Type: String
     Default: photo-search-v1-photos-bucket
+
 
 Resources:
   # S3 Buckets
@@ -187,10 +191,9 @@ Resources:
       Runtime: python3.9
       Environment:
         Variables:
-          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+          OPENSEARCH_ENDPOINT: !Ref ExistingOpenSearchEndpoint
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
-          TEMP_VAR: "placeholder"
 
   LF2SearchPhotos:
     Type: AWS::Lambda::Function
@@ -202,12 +205,13 @@ Resources:
       Runtime: python3.9
       Environment:
         Variables:
-          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+          OPENSEARCH_ENDPOINT: !Ref ExistingOpenSearchEndpoint
           LEX_BOT_ID: !Ref LexBotId
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
           S3_BUCKET: !Ref PhotosBucketName
+
 
 
   # S3 Permission for Lambda Trigger

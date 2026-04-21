@@ -211,7 +211,7 @@ Resources:
           - PathPattern: "/v1/*"
             TargetOriginId: ApiOrigin
             ViewerProtocolPolicy: https-only
-            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b391dd810ba # Managed-CachingDisabled
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
             OriginRequestPolicyId: b689b0a8-53d0-40a8-b0e6-264c18b12859 # Managed-AllViewerExceptHostHeader
 
   # API Gateway

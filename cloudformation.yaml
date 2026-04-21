@@ -126,9 +126,9 @@ Resources:
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
-#               - Effect: Allow
-#                 Action: es:ESHttpPost
-#                 Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
+              - Effect: Allow
+                Action: es:ESHttpPost
+                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
 
   LF2ExecutionRole:
     Type: AWS::IAM::Role
@@ -150,9 +150,9 @@ Resources:
               - Effect: Allow
                 Action: lex:RecognizeText
                 Resource: '*'
-#               - Effect: Allow
-#                 Action: es:ESHttpPost
-#                 Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
+              - Effect: Allow
+                Action: es:ESHttpPost
+                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
@@ -202,11 +202,11 @@ Resources:
       Runtime: python3.9
       Environment:
         Variables:
-#           OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
           LEX_BOT_ID: !Ref LexBotId
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
-#           OS_USER: !Ref OpenSearchUser
-#           OS_PASS: !Ref OpenSearchPass
+          OS_USER: !Ref OpenSearchUser
+          OS_PASS: !Ref OpenSearchPass
           S3_BUCKET: !Ref PhotosBucketName
 
 

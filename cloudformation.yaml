@@ -93,8 +93,8 @@ Resources:
           - Effect: Allow
             Principal:
               AWS:
-                - !Sub "arn:aws:iam::${AWS::AccountId}:role/LF1ExecutionRole"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:role/LF2ExecutionRole"
+                - !GetAtt LF1ExecutionRole.Arn
+                - !GetAtt LF2ExecutionRole.Arn
             Action: 'es:ESHttp*'
             Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*'
 
@@ -102,7 +102,6 @@ Resources:
   LF1ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LF1ExecutionRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -132,7 +131,6 @@ Resources:
   LF2ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LF2ExecutionRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

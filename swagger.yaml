@@ -3,12 +3,14 @@ info:
   title: AI Photo Search
   description: 'AI Photo Search application, built during the Cloud and Big Data course at Columbia University.'
   version: 1.0.0
+x-amazon-apigateway-security-policy: "TLS_1_0"
 x-amazon-apigateway-binary-media-types:
   - 'image/png'
   - 'image/jpg'
   - 'image/jpeg'
   - 'image/bmp'
   - 'image/webp'
+  - 'image/tiff'
 schemes:
   - https
 basePath: /v1
@@ -35,10 +37,6 @@ paths:
             $ref: '#/definitions/SearchResponse'
           headers:
             Access-Control-Allow-Origin:
-              type: string
-            Access-Control-Allow-Methods:
-              type: string
-            Access-Control-Allow-Headers:
               type: string
         '403':
           description: Unauthorized
@@ -80,7 +78,7 @@ paths:
           default:
             statusCode: "200"
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
@@ -104,12 +102,6 @@ paths:
           in: header
           required: false
           type: string
-      consumes:
-        - image/png
-        - image/jpg
-        - image/jpeg
-        - image/bmp
-        - image/webp
       produces:
         - application/json
       responses:
@@ -119,10 +111,6 @@ paths:
             type: object
           headers:
             Access-Control-Allow-Origin:
-              type: string
-            Access-Control-Allow-Methods:
-              type: string
-            Access-Control-Allow-Headers:
               type: string
         '403':
           description: Unauthorized
@@ -205,3 +193,14 @@ definitions:
         format: int32
       message:
         type: string
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"

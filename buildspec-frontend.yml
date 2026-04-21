@@ -6,14 +6,22 @@ phases:
       nodejs: 20
     commands:
       - echo Installing frontend dependencies...
-      - ls -al
       - cd photo-album && npm install
   build:
     commands:
       - echo Building Vite application...
-      - pwd
-      - ls -al
-      - npm run build
+      - echo Fetching API URL from CloudFormation...
+      - API_URL=$(aws cloudformation describe-stacks --stack-name photo-search-stack --query 'Stacks[0].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)
+      - echo "Using API URL: $API_URL"
+      - |
+        if [ -n "$API_URL" ] && [ "$API_URL" != "None" ]; then
+          echo "Updating apigClient.js with new invokeUrl..."
+          # Use sed to replace the line starting with '    var invokeUrl ='
+          sed -i "s|var invokeUrl = '.*';|var invokeUrl = '$API_URL';|g" photo-album/public/sdk/apigClient.js
+        else
+          echo "WARNING: Could not fetch API_URL. Deployment might fail or use old value."
+        fi
+      - cd photo-album && npm run build
 
 artifacts:
   base-directory: photo-album/dist

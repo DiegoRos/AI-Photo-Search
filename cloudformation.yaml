@@ -4,11 +4,11 @@ Description: AI Photo Search Application Infrastructure
 Parameters:
   OpenSearchUser:
     Type: String
-    Default: admin
+    Default: dr3432
   OpenSearchPass:
     Type: String
     NoEcho: true
-    Default: Admin123!
+    Default: \#Tipo123
   ExistingOpenSearchEndpoint:
     Type: String
     Default: "https://search-photos-azg567v37deut3tsvvucmickne.aos.us-east-1.on.aws"
@@ -18,13 +18,13 @@ Parameters:
     Type: String
   OpenSearchDomainName:
     Type: String
-    Default: photos-v1
+    Default: photos
   FrontendBucketName:
     Type: String
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-storage-bucket-b2-972793825948-us-east-1-an
+    Default: photo-storage-bucket-b2-972793825948-us-east-1-an-v1
 
 
 Resources:
@@ -86,7 +86,7 @@ Resources:
                 Action:
                   - s3:GetObject
                   - s3:HeadObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
@@ -113,7 +113,7 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action: s3:GetObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
@@ -132,7 +132,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
 
   # Lambda Functions
   LF1IndexPhotos:
@@ -151,6 +151,7 @@ Resources:
   LF2SearchPhotos:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: search-photos
       Handler: search-photos.lambda_handler
       Role: !GetAtt LF2ExecutionRole.Arn
       Code: ./backend/lf2
@@ -162,7 +163,7 @@ Resources:
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
-          S3_BUCKET: !Ref PhotosBucket
+          S3_BUCKET: !Ref PhotosBucketName
 
 
   # S3 Permission for Lambda Trigger
@@ -174,6 +175,14 @@ Resources:
       Principal: s3.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
       SourceArn: !Sub "arn:aws:s3:::${PhotosBucketName}"
+
+  LF2ApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt LF2SearchPhotos.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PhotoApi}/*"
 
   # API Gateway
   PhotoApi:
@@ -190,7 +199,7 @@ Resources:
         Fn::Transform:
           Name: AWS::Include
           Parameters:
-            Location: ./swagger.yaml
+            Location: s3://cf-templates-ukh091iw4l9z-us-east-1/swagger.yaml
 
   # API Deployment & Stage
   ApiDeployment:

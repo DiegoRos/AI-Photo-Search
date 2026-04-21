@@ -100,6 +100,12 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:s3:::${FrontendBucketName}/*"
                   - !Sub "arn:aws:s3:::${FrontendBucketName}"
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                Resource:
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack"
 
   # IAM Role for CodePipeline
   CodePipelineRole:

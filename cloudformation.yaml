@@ -55,7 +55,6 @@ Resources:
 
   PhotosBucket:
     Type: AWS::S3::Bucket
-    DependsOn: LF1S3Permission
     Properties:
       CorsConfiguration:
         CorsRules:
@@ -89,7 +88,8 @@ Resources:
                 Action:
                   - s3:GetObject
                   - s3:HeadObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                # Use parameter to break dependency cycle
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
@@ -116,7 +116,8 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action: s3:GetObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                # Use parameter to break dependency cycle
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
@@ -135,7 +136,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                # Use parameter to break dependency cycle
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}*"
 
   # Lambda Functions
   LF1IndexPhotos:
@@ -176,7 +178,8 @@ Resources:
       FunctionName: !GetAtt LF1IndexPhotos.Arn
       Principal: s3.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
-      SourceArn: !Sub "arn:aws:s3:::${PhotosBucket}"
+      # Use wildcard or parameter to break cycle
+      SourceArn: !Sub "arn:aws:s3:::${PhotosBucketName}*"
 
   # API Gateway
   PhotoApi:

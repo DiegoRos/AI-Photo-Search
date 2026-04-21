@@ -66,39 +66,39 @@ Resources:
             Function: !GetAtt LF1IndexPhotos.Arn
 
   # OpenSearch Domain
-  OpenSearchDomain:
-    Type: AWS::OpenSearchService::Domain
-    Properties:
-      DomainName: !Ref OpenSearchDomainName
-      EngineVersion: OpenSearch_2.11
-      ClusterConfig:
-        InstanceType: t3.small.search
-        InstanceCount: 1
-      EBSOptions:
-        EBSEnabled: true
-        VolumeSize: 10
-      NodeToNodeEncryptionOptions:
-        Enabled: true
-      EncryptionAtRestOptions:
-        Enabled: true
-      DomainEndpointOptions:
-        EnforceHTTPS: true
-      AdvancedSecurityOptions:
-        Enabled: true
-        InternalUserDatabaseEnabled: true
-        MasterUserOptions:
-          MasterUserName: !Ref OpenSearchUser
-          MasterUserPassword: !Ref OpenSearchPass
-      AccessPolicies:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS:
-                - !GetAtt LF1ExecutionRole.Arn
-                - !GetAtt LF2ExecutionRole.Arn
-            Action: 'es:ESHttp*'
-            Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*'
+#   OpenSearchDomain:
+#     Type: AWS::OpenSearchService::Domain
+#     Properties:
+#       DomainName: !Ref OpenSearchDomainName
+#       EngineVersion: OpenSearch_2.11
+#       ClusterConfig:
+#         InstanceType: t3.small.search
+#         InstanceCount: 1
+#       EBSOptions:
+#         EBSEnabled: true
+#         VolumeSize: 10
+#       NodeToNodeEncryptionOptions:
+#         Enabled: true
+#       EncryptionAtRestOptions:
+#         Enabled: true
+#       DomainEndpointOptions:
+#         EnforceHTTPS: true
+#       AdvancedSecurityOptions:
+#         Enabled: true
+#         InternalUserDatabaseEnabled: true
+#         MasterUserOptions:
+#           MasterUserName: !Ref OpenSearchUser
+#           MasterUserPassword: !Ref OpenSearchPass
+#       AccessPolicies:
+#         Version: '2012-10-17'
+#         Statement:
+#           - Effect: Allow
+#             Principal:
+#               AWS:
+#                 - !GetAtt LF1ExecutionRole.Arn
+#                 - !GetAtt LF2ExecutionRole.Arn
+#             Action: 'es:ESHttp*'
+#             Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*'
 
   # IAM Roles
   LF1ExecutionRole:
@@ -126,9 +126,9 @@ Resources:
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
-              - Effect: Allow
-                Action: es:ESHttpPost
-                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
+#               - Effect: Allow
+#                 Action: es:ESHttpPost
+#                 Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
 
   LF2ExecutionRole:
     Type: AWS::IAM::Role
@@ -150,9 +150,9 @@ Resources:
               - Effect: Allow
                 Action: lex:RecognizeText
                 Resource: '*'
-              - Effect: Allow
-                Action: es:ESHttpPost
-                Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
+#               - Effect: Allow
+#                 Action: es:ESHttpPost
+#                 Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${OpenSearchDomainName}/*"
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
@@ -180,7 +180,7 @@ Resources:
   LF1IndexPhotos:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: index-photos
+#       FunctionName: index-photos
       Handler: index-photos.lambda_handler
       Role: !GetAtt LF1ExecutionRole.Arn
       Code: ./backend/lf1
@@ -190,23 +190,25 @@ Resources:
           OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
+          TEMP_VAR: "placeholder"
 
   LF2SearchPhotos:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: search-photos
+#       FunctionName: search-photos
       Handler: search-photos.lambda_handler
       Role: !GetAtt LF2ExecutionRole.Arn
       Code: ./backend/lf2
       Runtime: python3.9
       Environment:
         Variables:
-          OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
+#           OPENSEARCH_ENDPOINT: !Sub "https://${OpenSearchDomain.DomainEndpoint}"
           LEX_BOT_ID: !Ref LexBotId
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
-          OS_USER: !Ref OpenSearchUser
-          OS_PASS: !Ref OpenSearchPass
+#           OS_USER: !Ref OpenSearchUser
+#           OS_PASS: !Ref OpenSearchPass
           S3_BUCKET: !Ref PhotosBucketName
+
 
   # S3 Permission for Lambda Trigger
   LF1S3Permission:

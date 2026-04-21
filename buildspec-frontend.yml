@@ -17,12 +17,14 @@ phases:
       - "echo \"Using API URL: $API_URL\""
       - "echo \"Using Rest API ID: $REST_API_ID\""
       - |
+        cd photo-album
         if [ -n "$REST_API_ID" ] && [ "$REST_API_ID" != "null" ]; then
           echo "Downloading latest JavaScript SDK from API Gateway..."
           if aws apigateway get-sdk --rest-api-id $REST_API_ID --stage-name v1 --sdk-type javascript sdk.zip; then
             mkdir -p temp_sdk
             unzip -o sdk.zip -d temp_sdk
-            cp -r temp_sdk/*/* photo-album/public/sdk/
+            mkdir -p public/sdk
+            cp -r temp_sdk/*/* public/sdk/
             rm -rf temp_sdk sdk.zip
             echo "SDK updated successfully."
           else
@@ -34,9 +36,9 @@ phases:
         
         if [ -n "$API_URL" ] && [ "$API_URL" != "null" ]; then
           echo "Updating invokeUrl in apigClient.js to $API_URL"
-          sed -i "s|var invokeUrl = '.*';|var invokeUrl = '$API_URL';|g" photo-album/public/sdk/apigClient.js
+          sed -i "s|var invokeUrl = '.*';|var invokeUrl = '$API_URL';|g" public/sdk/apigClient.js
         fi
-      - cd photo-album && npm run build
+        npm run build
 
 artifacts:
   base-directory: photo-album/dist

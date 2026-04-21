@@ -224,3 +224,6 @@ Outputs:
     Value: !GetAtt FrontendBucket.WebsiteURL
   ApiURL:
     Value: !Sub "https://${PhotoApi}.execute-api.${AWS::Region}.amazonaws.com/v1"
+  RestApiId:
+    Value: !Ref PhotoApi
+

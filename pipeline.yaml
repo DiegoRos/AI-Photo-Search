@@ -21,7 +21,7 @@ Parameters:
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-storage-bucket-b2-972793825948-us-east-1-an 
+    Default: photo-storage-bucket-b2-972793825948-us-east-1-an-v1
 
 Resources:
   PipelineArtifactBucket:
@@ -103,9 +103,11 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudformation:DescribeStacks
+                  - apigateway:GET
                 Resource:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack"
+                  - !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/*"
 
   # IAM Role for CodePipeline
   CodePipelineRole:

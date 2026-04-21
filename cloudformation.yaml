@@ -54,20 +54,20 @@ Resources:
             Action: "s3:GetObject"
             Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
 
-  PhotosBucket:
-    Type: AWS::S3::Bucket
-    DependsOn: LF1S3Permission
-    Properties:
-      BucketName: !Ref PhotosBucketName
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders: ['*']
-            AllowedMethods: ["PUT", "GET", "POST"]
-            AllowedOrigins: ['*']
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: "s3:ObjectCreated:*"
-            Function: !GetAtt LF1IndexPhotos.Arn
+  # PhotosBucket:
+  #   Type: AWS::S3::Bucket
+  #   DependsOn: LF1S3Permission
+  #   Properties:
+  #     BucketName: !Ref PhotosBucketName
+  #     CorsConfiguration:
+  #       CorsRules:
+  #         - AllowedHeaders: ['*']
+  #           AllowedMethods: ["PUT", "GET", "POST"]
+  #           AllowedOrigins: ['*']
+  #     NotificationConfiguration:
+  #       LambdaConfigurations:
+  #         - Event: "s3:ObjectCreated:*"
+  #           Function: !GetAtt LF1IndexPhotos.Arn
 
   # OpenSearch Domain
 #   OpenSearchDomain:

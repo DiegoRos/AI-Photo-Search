@@ -120,7 +120,7 @@ Resources:
                 Action:
                   - s3:GetObject
                   - s3:HeadObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
               - Effect: Allow
                 Action: rekognition:DetectLabels
                 Resource: '*'
@@ -153,7 +153,7 @@ Resources:
                 Resource: !Sub "${OpenSearchDomain.Arn}/*"
               - Effect: Allow
                 Action: s3:GetObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
@@ -172,7 +172,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !Sub "arn:aws:s3:::${PhotosBucket}/*"
+                Resource: !Sub "arn:aws:s3:::${PhotosBucketName}/*"
 
   # Lambda Functions
   LF1IndexPhotos:
@@ -204,7 +204,7 @@ Resources:
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           OS_USER: !Ref OpenSearchUser
           OS_PASS: !Ref OpenSearchPass
-          S3_BUCKET: !Ref PhotosBucket
+          S3_BUCKET: !Ref PhotosBucketName
 
   # S3 Permission for Lambda Trigger
   LF1S3Permission:

@@ -11,6 +11,8 @@ x-amazon-apigateway-binary-media-types:
   - 'image/bmp'
   - 'image/webp'
   - 'image/tiff'
+  - 'image/*'
+  - 'application/octet-stream'
   - '*/*'
 schemes:
   - https
@@ -90,6 +92,15 @@ paths:
       description: |
         This API takes in the multi-part body sent to it (ex. a photo) and uploads it to an S3 bucket.
       operationId: uploadPhoto
+      consumes:
+        - image/png
+        - image/jpg
+        - image/jpeg
+        - image/bmp
+        - image/webp
+        - image/tiff
+        - image/*
+        - application/octet-stream
       parameters:
         - name: item
           in: path

@@ -144,9 +144,19 @@ paths:
           integration.request.header.x-amz-meta-customLabels: "method.request.header.x-amz-meta-customLabels"
           integration.request.path.item: "method.request.path.item"
           integration.request.header.Content-Type: "method.request.header.Content-Type"
+        requestTemplates:
+          image/png: "$input.body"
+          image/jpg: "$input.body"
+          image/jpeg: "$input.body"
+          image/bmp: "$input.body"
+          image/webp: "$input.body"
+          image/tiff: "$input.body"
+          image/*: "$input.body"
+          application/octet-stream: "$input.body"
         passthroughBehavior: "when_no_match"
         httpMethod: "PUT"
         type: "aws"
+        contentHandling: CONVERT_TO_BINARY
         credentials:
           Fn::GetAtt: [ApiGatewayS3Role, Arn]
     options:

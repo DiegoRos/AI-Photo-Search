@@ -196,6 +196,8 @@ Resources:
         - 'image/jpeg'
         - 'image/bmp'
         - 'image/webp'
+        - 'image/tiff'
+        - '*/*'
       Body:
         Fn::Transform:
           Name: AWS::Include

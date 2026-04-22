@@ -11,6 +11,7 @@ x-amazon-apigateway-binary-media-types:
   - 'image/bmp'
   - 'image/webp'
   - 'image/tiff'
+  - '*/*'
 schemes:
   - https
 basePath: /v1

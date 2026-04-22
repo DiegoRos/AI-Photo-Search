@@ -193,15 +193,23 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess # CFN needs broad access to create various resources
 
-  # Integrated Application Pipeline
   AppPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: photo-search-pipeline
+      PipelineType: V2
       RoleArn: !GetAtt CodePipelineRole.Arn
       ArtifactStore:
         Type: S3
         Location: !Ref PipelineArtifactBucket
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: GitHub_Source
+            Push:
+              - Branches:
+                  Includes:
+                    - !Ref GitHubBranch
       Stages:
         - Name: Source
           Actions:

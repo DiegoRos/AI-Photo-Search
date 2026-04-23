@@ -1,64 +1,54 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
-  title: AI Photo Search
-  description: 'AI Photo Search application, built during the Cloud and Big Data course at Columbia University.'
-  version: 1.0.0
-x-amazon-apigateway-security-policy: "TLS_1_0"
-x-amazon-apigateway-binary-media-types:
-  - 'image/png'
-  - 'image/jpg'
-  - 'image/jpeg'
-  - 'image/bmp'
-  - 'image/webp'
-  - 'image/tiff'
-  - 'image/*'
-  - 'application/octet-stream'
-  - '*/*'
+  description: "AI Photo Search application, built during the Cloud and Big Data course\
+    \ at Columbia University."
+  version: "1.0.0"
+  title: "AI Photo Search"
+host: "u6trahgvj7.execute-api.us-east-1.amazonaws.com"
+basePath: "/dev"
 schemes:
-  - https
-basePath: /v1
-produces:
-  - application/json
+- "https"
 paths:
   /search:
     get:
-      summary: photo search method
-      description: |
-        This API takes in a search query as a query parameter and returns zero or more photos that match the search query.
-      operationId: searchPhotos
-      parameters:
-        - in: query
-          name: q
-          type: string
-          description: the string to be searched
+      operationId: "searchPhotos"
       produces:
-        - application/json
+      - "application/json"
+      parameters:
+      - name: "q"
+        in: "query"
+        required: false
+        type: "string"
       responses:
-        '200':
-          description: search results
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/SearchResponse'
+            $ref: "#/definitions/SearchResponse"
           headers:
             Access-Control-Allow-Origin:
-              type: string
-        '403':
-          description: Unauthorized
+              type: "string"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/Error'
-        '500':
-          description: Unexpected error
+            $ref: "#/definitions/Error"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/Error"
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LF2SearchPhotos}/invocations"
-        passthroughBehavior: "when_no_match"
         httpMethod: "POST"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        responseTransferMode: "BUFFERED"
+        contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
     options:
       summary: CORS support
-      description: |
-        Enable CORS by returning the correct headers
       consumes:
         - application/json
       produces:
@@ -81,41 +71,33 @@ paths:
           default:
             statusCode: "200"
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: ""
+            passthroughBehavior: "when_no_match"
   /upload/{item}:
     put:
       summary: photo upload method
       description: |
         This API takes in the multi-part body sent to it (ex. a photo) and uploads it to an S3 bucket.
       operationId: uploadPhoto
-      consumes:
-        - image/png
-        - image/jpg
-        - image/jpeg
-        - image/bmp
-        - image/webp
-        - image/tiff
-        - image/*
-        - application/octet-stream
-      parameters:
-        - name: item
-          in: path
-          required: true
-          type: string
-        - name: x-amz-meta-customLabels
-          in: header
-          required: false
-          type: string
-        - name: Content-Type
-          in: header
-          required: false
-          type: string
       produces:
         - application/json
+      parameters:
+      - name: "Content-Type"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "x-amz-meta-customLabels"
+        in: "header"
+        required: false
+        type: "string"
       responses:
         '200':
           description: S3 PUT operation response
@@ -133,8 +115,11 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [ApiGatewayS3Role, Arn]
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:s3:path/${PhotosBucketName}/{item}"
+        httpMethod: "PUT"
         responses:
           default:
             statusCode: "200"
@@ -144,85 +129,79 @@ paths:
           integration.request.header.x-amz-meta-customLabels: "method.request.header.x-amz-meta-customLabels"
           integration.request.path.item: "method.request.path.item"
           integration.request.header.Content-Type: "method.request.header.Content-Type"
-        requestTemplates:
-          image/png: "$input.body"
-          image/jpg: "$input.body"
-          image/jpeg: "$input.body"
-          image/bmp: "$input.body"
-          image/webp: "$input.body"
-          image/tiff: "$input.body"
-          image/*: "$input.body"
-          application/octet-stream: "$input.body"
         passthroughBehavior: "when_no_match"
-        httpMethod: "PUT"
         type: "aws"
-        contentHandling: CONVERT_TO_BINARY
-        credentials:
-          Fn::GetAtt: [ApiGatewayS3Role, Arn]
     options:
-      summary: CORS support
-      description: |
-        Enable CORS by returning the correct headers
       consumes:
-        - application/json
-      produces:
-        - application/json
+      - "application/json"
+      parameters:
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
       responses:
-        '200':
-          description: Default response for CORS method
+        "200":
+          description: "200 response"
           headers:
             Access-Control-Allow-Origin:
-              type: string
+              type: "string"
             Access-Control-Allow-Methods:
-              type: string
+              type: "string"
             Access-Control-Allow-Headers:
-              type: string
+              type: "string"
       x-amazon-apigateway-integration:
-        type: mock
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         responses:
           default:
             statusCode: "200"
             responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
-              method.response.header.Access-Control-Allow-Methods: "'PUT,OPTIONS'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-            responseTemplates:
-              application/json: ""
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "when_no_match"
+        type: "mock"
 definitions:
-  SearchResponse:
-    type: object
-    properties:
-      results:
-        type: array
-        items:
-          $ref: '#/definitions/Photo'
-  Photo:
-    type: object
-    properties:
-      url:
-        type: string
-      labels:
-        type: array
-        items:
-          type: string
   Error:
-    type: object
+    type: "object"
     properties:
       code:
-        type: integer
-        format: int32
+        type: "integer"
+        format: "int32"
       message:
-        type: string
+        type: "string"
+  Photo:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+      labels:
+        type: "array"
+        items:
+          type: "string"
+  SearchResponse:
+    type: "object"
+    properties:
+      results:
+        type: "array"
+        items:
+          $ref: "#/definitions/Photo"
+x-amazon-apigateway-security-policy: "TLS_1_0"
 x-amazon-apigateway-gateway-responses:
-  DEFAULT_4XX:
-    responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
-      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
   DEFAULT_5XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
       gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
       gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,PUT'"
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
+x-amazon-apigateway-binary-media-types:
+- "image/jpeg"
+- "image/jpg"
+- "image/webp"
+- "image/png"
+- "image/tiff"
+- "image/bmp"

@@ -32,6 +32,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref FrontendBucketName
+      AccessControl: PublicRead
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html

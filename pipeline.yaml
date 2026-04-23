@@ -286,7 +286,6 @@ Resources:
               Configuration:
                 BucketName: !Ref FrontendBucketName
                 Extract: 'true'
-                CannedACL: public-read
               InputArtifacts:
                 - Name: FrontendBuildArtifact
 

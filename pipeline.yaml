@@ -11,7 +11,7 @@ Parameters:
     Default: main
   GitHubConnectionArn:
     Type: String
-    Description: ARN of the CodeStar Connection to GitHub (must be created manually)
+    Description: arn:aws:codeconnections:us-east-1:972793825948:connection/0a5b1ec4-e871-4a31-9099-7f4112dafb6c
   LexBotId:
     Type: String
   LexBotAliasId:

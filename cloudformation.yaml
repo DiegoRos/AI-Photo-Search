@@ -157,6 +157,7 @@ Resources:
       Role: !GetAtt LF2ExecutionRole.Arn
       Code: ./backend/lf2
       Runtime: python3.9
+      Timeout: 20
       Environment:
         Variables:
           OPENSEARCH_ENDPOINT: !Ref ExistingOpenSearchEndpoint

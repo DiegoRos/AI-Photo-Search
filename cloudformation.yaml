@@ -201,8 +201,6 @@ Resources:
         - 'image/webp'
         - 'image/tiff'
         - 'image/*'
-        - 'application/octet-stream'
-        - '*/*'
       Body:
         Fn::Transform:
           Name: AWS::Include

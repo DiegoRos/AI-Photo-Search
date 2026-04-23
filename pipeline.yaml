@@ -21,8 +21,7 @@ Parameters:
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-storage-bucket-b2-v1 
-
+    Default: photo-storage-bucket-b2-v1
 Resources:
   PipelineArtifactBucket:
     Type: AWS::S3::Bucket

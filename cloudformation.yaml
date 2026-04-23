@@ -24,8 +24,7 @@ Parameters:
     Default: photo-search-v1-frontend-bucket
   PhotosBucketName:
     Type: String
-    Default: photo-storage-bucket-b2-972793825948-us-east-1-an-v1
-
+    Default: photo-storage-bucket-b2-v1 
 
 Resources:
   # S3 Buckets

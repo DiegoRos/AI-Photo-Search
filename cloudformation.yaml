@@ -32,17 +32,16 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref FrontendBucketName
-      AccessControl: PublicRead
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerPreferred
+          - ObjectOwnership: BucketOwnerEnforced
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
+        BlockPublicAcls: true
         BlockPublicPolicy: false
-        IgnorePublicAcls: false
+        IgnorePublicAcls: true
         RestrictPublicBuckets: false
 
   PhotosBucket:

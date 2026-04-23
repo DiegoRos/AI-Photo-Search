@@ -95,7 +95,10 @@ Resources:
                 Action:
                   - s3:PutObject
                   - s3:PutObjectAcl
+                  - s3:PutObjectVersionAcl
                   - s3:ListBucket
+                  - s3:GetBucketLocation
+                  - s3:GetObject
                 Resource:
                   - !Sub "arn:aws:s3:::${FrontendBucketName}/*"
                   - !Sub "arn:aws:s3:::${FrontendBucketName}"
@@ -169,7 +172,10 @@ Resources:
                 Action:
                   - s3:PutObject
                   - s3:PutObjectAcl
+                  - s3:PutObjectVersionAcl
                   - s3:ListBucket
+                  - s3:GetBucketLocation
+                  - s3:GetObject
                 Resource:
                   - !Sub "arn:aws:s3:::${FrontendBucketName}/*"
                   - !Sub "arn:aws:s3:::${FrontendBucketName}"
@@ -286,6 +292,7 @@ Resources:
               Configuration:
                 BucketName: !Ref FrontendBucketName
                 Extract: 'true'
+                CannedACL: public-read
               InputArtifacts:
                 - Name: FrontendBuildArtifact
 

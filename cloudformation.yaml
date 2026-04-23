@@ -34,14 +34,14 @@ Resources:
       BucketName: !Ref FrontendBucketName
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerEnforced
+          - ObjectOwnership: ObjectWriter
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
+        BlockPublicAcls: false
         BlockPublicPolicy: false
-        IgnorePublicAcls: true
+        IgnorePublicAcls: false
         RestrictPublicBuckets: false
 
   PhotosBucket:

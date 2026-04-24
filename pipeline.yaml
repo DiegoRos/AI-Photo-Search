@@ -106,6 +106,7 @@ Resources:
                 Action:
                   - cloudformation:DescribeStacks
                   - apigateway:GET
+                  - apigateway:POST
                 Resource:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack/*"
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/photo-search-stack"

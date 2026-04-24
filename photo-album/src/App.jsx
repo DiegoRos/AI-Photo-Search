@@ -54,7 +54,13 @@ function App() {
       alert("SDK not loaded. Refresh the page.");
       return;
     }
-    console.log('Uploading file:', file.name);
+    
+    console.log('--- Upload Debug Info ---');
+    console.log('File object:', file);
+    console.log('File name:', file.name);
+    console.log('File type:', file.type);
+    console.log('File size:', file.size);
+    console.log('Custom labels:', labels);
 
     try {
       const params = {
@@ -65,8 +71,13 @@ function App() {
       const body = file; // The binary file blob
       const additionalParams = {};
 
+      console.log('Params being sent to SDK:', params);
+      console.log('Body being sent to SDK:', body);
+      console.log('Additional params:', additionalParams);
+
       const result = await apigClient.uploadItemPut(params, body, additionalParams);
-      console.log('Upload result:', result);
+      console.log('Full SDK Result:', result);
+      
       if (result.status === 200) {
         alert('Upload successful!');
         setCustomLabels('');
